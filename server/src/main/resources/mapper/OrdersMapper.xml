@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.shoppingcart.OrdersDao">
+    <insert id="addOrders" parameterType="com.example.yzs.entity.shoppingcart.Orders" useGeneratedKeys="true"
+            keyProperty="orders.id">
+        INSERT INTO orders (order_no,goods_id, goods_name, number, total_price, created_time, pay_no, pay_time, pay_status,
+                            status, buyer_id,delivery_add)
+        VALUES (#{orders.orderNo},#{orders.goodsId}, #{orders.goodsName}, #{orders.number}, #{orders.totalPrice}, NOW(), #{orders.payNo}, #{expireAt}, #{orders.payStatus}, #{orders.status},
+                #{orders.buyerId},#{orders.deliveryAdd})
+    </insert>
+    <select id="selectOrders">
+        select id,order_no,goods_id, goods_name, number, total_price, created_time, pay_no, pay_time,pay_status,status,delivery_add from
+        orders
+        <where>
+            <if test="selectCondition != null and selectCondition != ''">
+                AND ( order_no LIKE CONCAT('%', #{selectCondition}, '%') OR
+                goods_id LIKE CONCAT('%', #{selectCondition}, '%') OR
+                goods_name LIKE CONCAT('%', #{selectCondition}, '%') OR
+                pay_no LIKE CONCAT('%', #{selectCondition}, '%') OR
+                total_price LIKE CONCAT('%', #{selectCondition}, '%') OR
+                pay_status LIKE CONCAT('%', #{selectCondition}, '%') OR
+                status LIKE CONCAT('%', #{selectCondition}, '%') )
+            </if>
+            AND buyer_id = #{buyerId} AND deleted = 0
+        </where>
+    </select>
+    <select id="selectByOrdersNo">
+        select *
+        from orders
+        where order_no = #{orderNo}
+    </select>
+    <update id="updateById" parameterType="com.example.yzs.entity.shoppingcart.Orders">
+        UPDATE orders
+        <set>
+            <if test="goodsName != null and goodsName != ''">
+                goods_name = #{goodsName},
+            </if>
+            <if test="number != null">
+                number = #{number},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="createdTime != null">
+                created_time = #{createdTime},
+            </if>
+            <if test="payNo != null and payNo != ''">
+                pay_no = #{payNo},
+            </if>
+            <if test="payTime != null">
+                pay_time = #{payTime},
+            </if>
+            <if test="payStatus != null">
+                pay_status = #{payStatus},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="buyerId != null">
+                buyer_id = #{buyerId},
+            </if>
+        </set>
+        <where>
+            order_no = #{orderNo}
+        </where>
+    </update>
+    <update id="updateStatus" parameterType="com.example.yzs.entity.shoppingcart.Orders">
+        UPDATE orders
+        <set>
+            status = #{status}
+        </set>
+        <where>
+            order_no = #{orderNo}
+        </where>
+    </update>
+    <insert id="evaluationOrder" parameterType="com.example.yzs.entity.evaluation.BookEvaluation" useGeneratedKeys="true"
+            keyProperty="evaluation.id">
+        INSERT INTO books_evaluation (order_no, goods_id,eva_id, content, media, description, logistics, attitude, created_time,
+                                updated_time)
+        VALUES (#{evaluation.orderNo},#{evaluation.goodsId}, #{evaId}, #{evaluation.content}, #{mediaString}, #{evaluation.description}, #{evaluation.logistics}, #{evaluation.attitude}, NOW(), NOW())
+    </insert>
+    <update id="delOrder" parameterType="com.example.yzs.entity.shoppingcart.Orders">
+        UPDATE orders
+        <set>
+           deleted = 1
+        </set>
+        <where>
+            order_no =#{orderNo}
+        </where>
+    </update>
+    <select id="salesEcharts" parameterType="com.example.yzs.entity.shoppingcart.Orders">
+        SELECT pay_time FROM orders order by pay_time asc
+    </select>
+</mapper>

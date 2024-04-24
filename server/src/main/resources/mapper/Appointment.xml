@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.consultation.AppointmentDao">
+    <insert id="addTable" parameterType="com.example.yzs.entity.consultation.AppointmentTable">
+        insert into appointment_table (cid, appointment_date, uid, status, type)
+        values (#{cid}, #{appointmentDate}, #{uid}, #{status}, #{appointmentType})
+    </insert>
+    <select id="findAppointmentInfo" resultType="com.example.yzs.entity.consultation.AppointmentTable">
+        select * from appointment_table
+        <where>
+            AND uid = #{uid}
+            AND deleted = 0
+        </where>
+    </select>
+
+    <update id="updateAppointmentSet" parameterType="com.example.yzs.entity.AppointmentSet">
+        update c_appointment_set
+        <set>
+            number = #{number},reservations = #{reservations}
+        </set>
+        <where>
+            appointment_date = #{appointmentDate}
+        </where>
+    </update>
+
+    <select id="findAppointmentTable" resultType="com.example.yzs.entity.consultation.AppointmentTable">
+        select *
+        from appointment_table
+    </select>
+    <update id="deleteAppointment">
+        UPDATE appointment_table
+        <set>
+            deleted = 1
+        </set>
+        <where>
+            appointment_date = #{appointmentDate} AND uid = #{uid} AND cid = #{cid}
+        </where>
+    </update>
+    <select id="getAppTableListByCid">
+        select u.uid,u.avatarUrl,u.name, u.nickname,u.sex,u.age, a.appointment_date,a.status,appointment_type.name as
+        appointmentType
+        from user_info u
+        left join appointment_table a on a.uid = u.uid
+        left join appointment_type on appointment_type.id = a.type
+        <where>
+            AND a.cid = #{cid}
+        </where>
+
+    </select>
+    <select id="getAppointmentNumber">
+        select appointment_date
+        from appointment_table
+        <where>
+            cid = #{cid}
+        </where>
+    </select>
+    <select id="getAppTableListByUid">
+        select c.*, a.appointment_date,a.status,appointment_type.name as appointmentType
+        from consultants_info c
+        left join appointment_table a on a.cid = c.cid
+        left join appointment_type on appointment_type.id = a.type
+        <where>
+            AND a.uid = #{uid}
+        </where>
+    </select>
+    <update id="updateAppStatus">
+        update appointment_table
+        <set>
+            status = #{status}
+        </set>
+        <where>
+            uid = #{uid} AND cid = #{cid} AND appointment_date = #{appointmentDate}
+        </where>
+    </update>
+    <select id="getAppointmentType">
+        select id, name as appointmentType
+        from appointment_type
+    </select>
+    <select id="appointmentNumByCid" parameterType="com.example.yzs.entity.consultation.AppointmentTable">
+        select appointment_date from appointment_table
+        <where>
+            AND cid = #{cid} AND deleted = 0
+            order by appointment_date asc
+        </where>
+    </select>
+    <select id="appointmentNumber" parameterType="com.example.yzs.entity.consultation.AppointmentTable">
+        select appointment_date from appointment_table where deleted = 0 order by appointment_date asc
+    </select>
+</mapper>

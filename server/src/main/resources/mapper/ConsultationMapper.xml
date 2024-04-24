@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.consultation.ConsultationDao">
+    <insert id="add" parameterType="com.example.yzs.entity.consultation.ConsultationTable" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT
+        consultation_table (uid, type, consultation_date, status, cid)
+           VALUES (
+        #{uid},
+        #{type},
+        #{consultationDate},
+        #{status},
+        #{cid}
+        )
+    </insert>
+    <select id="findConsultationTable">
+        select c.uid,
+               c.type,
+               c.consultation_date,
+               c.start_time,
+               c.end_time,
+               c.status,
+               c.description,
+               u.name,
+               u.nickname,
+               u.avatarUrl
+        FROM consultation_table c
+                 left join user_info u on u.uid = c.uid
+    </select>
+    <update id="updateStatus">
+        UPDATE consultation_table
+        <set>
+            status = #{status},
+            <if test="startTime != null and startTime != ''">
+                start_time = #{startTime},
+            </if>
+            <if test="startTime == null and endTime != null and endTime != ''">
+                end_time = #{endTime},
+            </if>
+            <if test="startTime == null and description != null ">
+                description = #{description}
+            </if>
+        </set>
+        <where>
+            uid = #{uid} AND cid = #{cid} AND consultation_date = #{consultationDate}
+        </where>
+    </update>
+    <insert id="evaluationConsultants" parameterType="com.example.yzs.entity.evaluation.ConsultationEvaluation"
+            useGeneratedKeys="true"
+            keyProperty="consultationEvaluation.id">
+        INSERT INTO consultation_evaluation (eva_id, cid, consultation_date, content, media, attitude, professional,
+                                             reliable, created_time)
+        VALUES (#{consultationEvaluation.evaId}, #{consultationEvaluation.cid},
+                #{consultationEvaluation.consultationDate}, #{consultationEvaluation.content}, #{mediaString},
+                #{consultationEvaluation.attitude}, #{consultationEvaluation.professional},
+                #{consultationEvaluation.reliable}, NOW())
+    </insert>
+</mapper>

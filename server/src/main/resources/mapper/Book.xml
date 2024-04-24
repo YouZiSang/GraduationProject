@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.BookDao">
+    <select id="bookList">
+        SELECT books.id,
+               books.ISBN,
+               books.title,
+               books.image,
+               books.author,
+               books.publisher,
+               books.number,
+               books.old_price,
+               books.price,
+               books.sales,
+               books_type.name as bookType
+        FROM books
+                 LEFT JOIN books_type ON books.type = books_type.id
+        WHERE books.deleted = 0
+    </select>
+    <insert id="addCollection" parameterType="com.example.yzs.entity.Books">
+        INSERT INTO collection_book (collectors_id, ISBN, title, image, author, price, role, created_time, updated_time)
+        VALUES (#{collectorsId}, #{ISBN}, #{title}, #{image}, #{author}, #{price}, #{role}, NOW(),
+                NOW()) ON DUPLICATE KEY
+        UPDATE
+            updated_time = NOW(),
+            deleted = 0
+    </insert>
+    <select id="findCollectedBooks" parameterType="com.example.yzs.entity.Books">
+        select collectors_id,ISBN from collection_book
+        <where>
+            collectors_id =#{collectorsId} AND ISBN IN
+            <foreach item="item" index="index" collection="ISBN" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            AND deleted = 0
+        </where>
+    </select>
+    <update id="deleteCollectedBooks">
+        update collection_book
+        <set>
+            deleted = 1
+        </set>
+        <where>
+            collectors_id =#{collectorsId} AND ISBN = #{ISBN}
+        </where>
+    </update>
+    <update id="updateBooks">
+        UPDATE books
+        <set>
+            number = #{number}
+        </set>
+        where ISBN = #{ISBN}
+    </update>
+    <update id="">
+        sales = sales +1,
+    </update>
+    <update id="updateBookSale" parameterType="com.example.yzs.entity.Books">
+        UPDATE books
+        <set>
+            sales = sales + #{number}
+        </set>
+        <where>
+            id = #{goodsId}
+        </where>
+    </update>
+    <select id="getEvaluation" parameterType="com.example.yzs.entity.evaluation.BookEvaluation">
+        SELECT
+            b.*,
+            u.nickname as name,
+            u.avatarUrl as avatar,
+            c.name,
+            c.avatarUrl as avatar
+        FROM
+            books_evaluation b
+                LEFT JOIN user_info u ON b.eva_id = u.uid
+                LEFT JOIN consultants_info c ON b.eva_id = c.cid
+        WHERE
+            b.goods_id = #{id}
+          AND (b.eva_id = u.uid OR b.eva_id = c.cid)
+    </select>
+    <select id="getRelatedBooks" parameterType="com.example.yzs.entity.Books">
+        SELECT b.ISBN, b.title, b.image, b.price, b.old_price, b.sales
+        FROM books_type bt
+                 left join books b on bt.id = b.type
+        WHERE bt.name = #{type} AND b.ISBN &lt;&gt; #{ISBN}
+        ORDER BY sales DESC
+            LIMIT 4;
+    </select>
+</mapper>

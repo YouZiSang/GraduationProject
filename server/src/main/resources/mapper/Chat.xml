@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.chat.ChatDao">
+    <select id="findById">
+        select *  from single_chat
+        where (from_id = #{fromId} and to_id = #{toId})
+        or (from_id = #{toId} and to_id = #{fromId})
+        ORDER BY time;
+    </select>
+    <insert id="addSingleChat" parameterType="com.example.yzs.entity.chat.Chat" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO single_chat (from_id, from_name, from_avatar, content, time, type, to_id, to_name, to_avatar)
+        VALUES (#{fromId}, #{fromName}, #{fromAvatar}, #{content}, NOW(), #{type}, #{toId}, #{toName}, #{toAvatar})
+    </insert>
+    <select id="selectGroupMessage" resultType="com.example.yzs.entity.chat.Chat">
+        SELECT id,uid, name, avatarUrl, content, time, type FROM group_chat
+    </select>
+    <insert id="addGroupChat" parameterType="com.example.yzs.entity.chat.Chat" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO group_chat (uid, name, avatarUrl, content, time, type)
+        VALUES (#{uid},#{name},#{avatarUrl},#{content},NOW(),#{type})
+    </insert>
+    <select id="aa" parameterType="com.example.yzs.entity.Questionnaire">
+        SELECT q.id as id,
+               q.question_text as question_text,
+               a.id as answer_id,
+               a.options as options,
+               a.option_text as option_text
+        FROM questions q
+                 LEFT JOIN answers a ON q.id = a.question_id
+        ORDER BY q.id, a.id;
+    </select>
+    <select id="bb" parameterType="com.example.yzs.entity.Questionnaire">
+        SELECT * from answers
+    </select>
+    <select id="unReaded" resultType="com.example.yzs.entity.chat.Chat">
+        SELECT from_id,to_id,readed FROM single_chat
+    </select>
+    <update id="updateIsReade" parameterType="com.example.yzs.entity.chat.Chat">
+        UPDATE single_chat
+        SET readed = #{readed}
+        WHERE from_id = #{fromId} and to_id = #{toId}
+    </update>
+</mapper>

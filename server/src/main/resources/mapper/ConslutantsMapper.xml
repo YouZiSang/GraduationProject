@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.ConsultantsDao">
+    <select id="login">
+        SELECT uid,password,role FROM account WHERE uid = #{uid} AND password = #{password} AND role = #{role}
+    </select>
+    <select id="getConsultantsInfoList" resultType="com.example.yzs.entity.ConsultantsInfo">
+        SELECT cid,name,avatarUrl FROM consultants_info
+    </select>
+    <select id="list" resultType="com.example.yzs.entity.ConsultantsInfo">
+        SELECT * FROM consultants_info
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="minAge != null">
+                AND age >= #{minAge}
+            </if>
+            <if test="maxAge != null">
+                AND age &lt;= #{maxAge}
+            </if>
+            AND deleted = 0
+        </where>
+    </select>
+    <select id="findApSet" resultType="com.example.yzs.entity.AppointmentSet">
+        select appointment_date,number,reservations
+        from c_appointment_set
+        <where>
+            cid = #{id}
+        </where>
+    </select>
+    <insert id="addAppointment" parameterType="com.example.yzs.entity.AppointmentSet" useGeneratedKeys="true" keyProperty="id">
+        insert into c_appointment_set (cid,appointment_date,number,reservations)
+        values (#{cid},#{appointmentDate},#{number},0)
+            on duplicate key update
+        number=#{number}
+    </insert>
+
+</mapper>

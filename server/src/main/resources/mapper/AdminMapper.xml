@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.AdminDao">
+    <select id="findAll" resultType="com.example.yzs.entity.Admin">
+        SELECT *
+        FROM admin
+    </select>
+    <select id="usersList" parameterType="com.example.yzs.entity.UserInfo">
+        select id,uid,name,avatarUrl,nickname,sex,age,email,phone,delivery_add,deleted from user_info
+        <where>
+            <if test="selectCondition != null and selectCondition != ''">
+                AND ( uid LIKE CONCAT('%', #{selectCondition}, '%') OR
+                name LIKE CONCAT('%', #{selectCondition}, '%') OR
+                nickname LIKE CONCAT('%', #{selectCondition}, '%') OR
+                sex LIKE CONCAT('%', #{selectCondition}, '%') OR
+                email LIKE CONCAT('%', #{selectCondition}, '%') OR
+                phone LIKE CONCAT('%', #{selectCondition}, '%') OR
+                delivery_add LIKE CONCAT('%', #{selectCondition}, '%'))
+            </if>
+            <if test="minAge != null">
+                AND age >= #{minAge}
+            </if>
+            <if test="maxAge != null">
+                AND age &lt;= #{maxAge}
+            </if>
+            AND deleted = 0
+        </where>
+    </select>
+    <update id="deleteUser">
+        UPDATE account
+        <set>
+            <if test="deleted != null and deleted != ''">
+                deleted = #{deleted},
+            </if>
+        </set>
+        <where>
+            uid = #{uid}
+        </where>
+    </update>
+    <update id="deleteUserInfo">
+        UPDATE user_info
+        <set>
+            <if test="deleted != null and deleted != ''">
+                deleted = #{deleted},
+            </if>
+        </set>
+        <where>
+            uid = #{uid}
+        </where>
+    </update>
+    <update id="deleteConsultant">
+        UPDATE account
+        <set>
+            <if test="deleted != null and deleted != ''">
+                deleted = #{deleted},
+            </if>
+        </set>
+        <where>
+            uid = #{cid}
+        </where>
+    </update>
+    <update id="deleteConsultantInfo">
+        UPDATE consultants_info
+        <set>
+            <if test="deleted != null and deleted != ''">
+                deleted = #{deleted},
+            </if>
+        </set>
+        <where>
+            cid = #{cid}
+        </where>
+    </update>
+    <select id="findAllBook" resultType="com.example.yzs.entity.Books">
+        SELECT books.id,
+               books.ISBN,
+               books.title,
+               books.image,
+               books.author,
+               books.publisher,
+               books.number,
+               books.old_price,
+               books.sales,
+               books.price,
+               books_type.name             as book_type,
+               COUNT(collection_book.ISBN) as collectNumber
+        FROM books
+                 LEFT JOIN collection_book ON books.ISBN = collection_book.ISBN AND collection_book.deleted = 0
+                 LEFT JOIN books_type ON books.type = books_type.id
+        WHERE books.deleted = 0
+        GROUP BY books.ISBN
+    </select>
+    <select id="selectISBN" resultType="String">
+        SELECT ISBN
+        FROM books
+    </select>
+    <update id="updateBooksInfo" parameterType="com.example.yzs.entity.Books">
+        UPDATE books
+        <set>
+            <if test="ISBN != null">ISBN = #{ISBN},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="author != null">author = #{author},</if>
+            <if test="publisher != null">publisher = #{publisher},</if>
+            <if test="number != null">number = #{number},</if>
+            <if test="bookType != null">type = #{bookType},</if>
+            <if test="oldPrice != null">old_price = #{oldPrice},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="updatedTime != null">updatedTime = #{updatedTime}</if>
+            updated_time = #{updatedTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+    <insert id="addBooks" parameterType="com.example.yzs.entity.Books" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO books (image, title, author, publisher, ISBN, number, type, old_price, price, created_time,
+                           updated_time)
+        VALUES (#{image}, #{title}, #{author}, #{publisher}, #{ISBN}, #{number}, #{bookType}, #{oldPrice}, #{price},
+                NOW(), NOW())
+    </insert>
+    <update id="delBooks">
+        UPDATE books
+        <set>
+            deleted = 1,
+            updated_time = NOW()
+        </set>
+        <where>
+            ISBN = #{ISBN}
+        </where>
+    </update>
+    <select id="searchBookInfo" parameterType="com.example.yzs.entity.Books" resultType="com.example.yzs.entity.Books">
+        SELECT books.id,
+        books.ISBN,
+        books.title,
+        books.image,
+        books.author,
+        books.publisher,
+        books.type,
+        books.number,
+        books.old_price,
+        books.sales,
+        books.price,
+        books_type.name AS bookType,
+        COUNT(collection_book.ISBN) AS collectNumber
+        FROM books
+        LEFT JOIN collection_book ON books.ISBN = collection_book.ISBN AND collection_book.deleted = 0
+        LEFT JOIN books_type ON books.type = books_type.id
+        WHERE books.deleted = 0
+        <if test="search != null and search != ''">
+            AND (
+            (books.id LIKE CONCAT('%', #{search}, '%')) OR
+            (books.title LIKE CONCAT('%', #{search}, '%')) OR
+            (books.author LIKE CONCAT('%', #{search}, '%')) OR
+            (books.publisher LIKE CONCAT('%', #{search}, '%')) OR
+            (books.ISBN LIKE CONCAT('%', #{search}, '%')) OR
+            (books.number LIKE CONCAT('%', #{search}, '%')) OR
+            (books.price LIKE CONCAT('%', #{search}, '%')) OR
+            (books.sales LIKE CONCAT('%', #{search}, '%'))
+            )
+        </if>
+        GROUP BY books.ISBN;
+    </select>
+    <select id="findAllOrders">
+        SELECT o.id,
+        o.order_no,
+        o.goods_name,
+        o.number,
+        o.total_price,
+        o.created_time,
+        o.pay_time,
+        o.status,
+        o.buyer_id,
+        o.delivery_add,
+        CASE
+        WHEN u.uid IS NOT NULL THEN u.nickname
+        WHEN c.cid IS NOT NULL THEN c.name
+        END AS buyerName
+        FROM orders o
+        LEFT JOIN
+        user_info u ON o.buyer_id = u.uid
+        LEFT JOIN
+        consultants_info c ON o.buyer_id = c.cid
+        WHERE o.deleted = 0 AND o.pay_time is not null
+        <if test="selectName != null and selectName != ''">
+            AND (
+            (u.uid IS NOT NULL AND u.nickname LIKE CONCAT('%', #{selectName}, '%'))
+            OR
+            (c.cid IS NOT NULL AND c.name LIKE CONCAT('%', #{selectName}, '%'))
+            )
+        </if>
+        <if test="selectGoodsName != null and selectGoodsName != ''">
+            AND goods_name LIKE CONCAT('%', #{selectGoodsName}, '%')
+        </if>
+    </select>
+    <update id="updateStatus" parameterType="com.example.yzs.entity.shoppingcart.Orders">
+        UPDATE orders
+        <set>
+            status = #{status}
+        </set>
+        <where>
+            order_no = #{orderNo}
+        </where>
+    </update>
+    <select id="findType" parameterType="com.example.yzs.entity.Type">
+        SELECT *
+        FROM books_type
+    </select>
+    <select id="searchBookTypeInfo">
+        SELECT books.id,
+        books.ISBN,
+        books.title,
+        books.image,
+        books.author,
+        books.publisher,
+        books.type,
+        books.number,
+        books.old_price,
+        books.sales,
+        books.price,
+        books_type.name AS bookType,
+        COUNT(collection_book.ISBN) AS collectNumber
+        FROM books
+        LEFT JOIN collection_book ON books.ISBN = collection_book.ISBN AND collection_book.deleted = 0
+        LEFT JOIN books_type ON books.type = books_type.id
+        WHERE books.deleted = 0
+        <if test="search != null and search != ''">
+            AND books_type.id = #{search}
+        </if>
+        GROUP BY books.ISBN;
+    </select>
+    <select id="findBookById">
+        SELECT books.*,
+               books_type.name             AS bookType,
+               COUNT(collection_book.ISBN) AS collectNumber
+        FROM books
+                 LEFT JOIN collection_book ON books.ISBN = collection_book.ISBN AND collection_book.deleted = 0
+                 LEFT JOIN books_type ON books.type = books_type.id
+        WHERE books.deleted = 0
+          AND books.id = #{id}
+    </select>
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO books (image, title, author, publisher, ISBN, number, type, old_price, price, created_time,
+        updated_time)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.image}, #{item.title}, #{item.author}, #{item.publisher}, #{item.ISBN}, #{item.number},
+            (SELECT id FROM books_type WHERE name = #{item.bookType}),
+            #{item.oldPrice}, #{item.price}, NOW(), NOW())
+        </foreach>
+    </insert>
+</mapper>

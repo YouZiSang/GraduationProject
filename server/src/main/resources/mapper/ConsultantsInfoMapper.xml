@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.yzs.dao.consultants.ConsultantsInfoDao">
+    <select id="getPersonalInfo" resultType="com.example.yzs.entity.ConsultantsInfo">
+        SELECT *
+        FROM consultants_info
+        where cid = #{id}
+    </select>
+    <select id="evaluate" parameterType="com.example.yzs.entity.evaluation.ConsultationEvaluation">
+        SELECT ce.*,
+               u.nickname as name,
+               u.avatarUrl as avatar
+        FROM consultation_evaluation ce
+                 LEFT JOIN user_info u ON ce.eva_id = u.uid
+        WHERE cid = #{cid};
+    </select>
+</mapper>

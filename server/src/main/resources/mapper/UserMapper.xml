@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.UserDao">
+    <select id="login" resultType="com.example.yzs.entity.Account">
+        SELECT uid,password,role,deleted FROM account where uid = #{uid} and password = #{password} AND role = #{role}
+    </select>
+    <update id="updatePwd" parameterType="com.example.yzs.entity.Account">
+        update account
+        <set>
+            password = #{newPwd}
+        </set>
+        <where>
+            uid = #{uid}
+        </where>
+    </update>
+    <insert id="insertUser" parameterType="com.example.yzs.entity.User">
+        insert into account (uid,password,role,create_time,update_time)
+        values (#{uid},#{password},'USER',Now(),Now())
+    </insert>
+</mapper>

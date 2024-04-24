@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.yzs.dao.AuditDao">
+    <select id="findEditConsultants" resultType="com.example.yzs.entity.ConsultantsInfo">
+        SELECT *
+        FROM consultants_info
+        where deleted = 0
+    </select>
+    <update id="successEdit" parameterType="com.example.yzs.entity.ConsultantsInfo">
+        UPDATE consultants_info
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="avatarUrl != null">avatarUrl = #{avatarUrl},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="certificate != null">certificate = #{certificate},</if>
+            <if test="biography != null">biography = #{biography}</if>
+        </set>
+        WHERE cid = #{cid}
+    </update>
+    <select id="findUserInfo">
+        SELECT * FROM user_info
+    </select>
+    <insert id="addConsultants">
+        INSERT INTO consultants_info (cid,name,avatarUrl,sex,age,phone,email,certificate,biography)
+        VALUES (#{cid},#{name},#{avatarUrl},#{sex},#{age},#{phone},#{email},#{certificate},#{biography})
+    </insert>
+    <update id="deleteUserInfo">
+        UPDATE user_info
+        SET deleted = 1
+        WHERE uid = #{uid}
+    </update>
+    <update id="updateAccountType">
+        UPDATE account
+        set role = 'CONSULTANT',update_time = NOW()
+        WHERE uid = #{uid}
+    </update>
+</mapper>

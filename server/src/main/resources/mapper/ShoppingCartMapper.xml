@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.shoppingcart.ShoppingCartDao">
+    <select id="findByISBN" resultType="com.example.yzs.entity.shoppingcart.ShoppingCart">
+        SELECT shopper_id,goods_id,image,title,ISBN,author,price,number,total_price FROM shopping_cart
+        <where>
+            <if test="shopper_id != null">
+                AND shopper_id = #{shopper_id}
+            </if>
+            <if test="ISBN != null">
+                AND ISBN = #{ISBN}
+            </if>
+        </where>
+    </select>
+    <insert id="addProducts" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO shopping_cart (shopper_id,goods_id, image, title, ISBN, author, price, number, total_price,delivery_add)
+        VALUES (#{shopperId},#{goodsId}, #{image}, #{title}, #{ISBN}, #{author}, #{price}, 1 , #{totalPrice},
+                (SELECT delivery_add
+                 FROM user_info
+                 WHERE uid = #{shopperId}
+                 UNION
+                 SELECT delivery_add
+                 FROM consultants_info
+                 WHERE cid = #{shopperId}))
+    </insert>
+    <update id="updateShoppingCart">
+        UPDATE shopping_cart
+        SET number      = #{number},
+            total_price = #{totalPrice}
+        WHERE shopper_id = #{shopperId}
+          AND ISBN = #{ISBN}
+    </update>
+    <select id="selectShoppingCartList" resultType="com.example.yzs.entity.shoppingcart.ShoppingCart">
+        SELECT image,goods_id, title, author, ISBN, price, number, total_price,delivery_add
+        FROM shopping_cart
+        WHERE shopper_id = #{id}
+    </select>
+    <delete id="batchDelete">
+        DELETE FROM shopping_cart
+        <where>
+            <if test="shopperId != null or shopperId != ''">
+                shopper_id = #{shopperId}
+            </if>
+            AND ISBN IN
+            <foreach collection="selectedItems" item="item" separator="," open="(" close=")">
+                #{item.ISBN}
+            </foreach>
+        </where>
+    </delete>
+    <delete id="delete">
+        DELETE FROM shopping_cart
+        <where>
+            <if test="shopperId != null or shopperId != ''">
+                shopper_id = #{shopperId}
+            </if>
+            AND
+            <if test="ISBN != null or ISBN != ''">
+                ISBN = #{ISBN}
+            </if>
+        </where>
+    </delete>
+    <select id="selectBookNumber">
+        SELECT SUM(number) AS total_number, SUM(total_price) AS total_price
+        FROM shopping_cart
+        WHERE shopper_id = #{shopperId}
+    </select>
+    <update id="updateNumber">
+        UPDATE shopping_cart
+        SET number = #{number} - 1,
+            total_price = (#{number} - 1) * #{price}
+        WHERE shopper_id = #{shopperId} AND ISBN = #{ISBN}
+    </update>
+</mapper>

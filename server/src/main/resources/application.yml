@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/psychology?useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  redis:
+    host: localhost
+    port: 6379
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.yzs.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8080
+
+alipay:
+  appId: 9021000134662785
+  appPrivateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdAHwRbk4rODMHTB65WNqghJqfxy+cxOwCnW3tVUOVsLe9c1PeOMNab5sB9cmlzEQcOmH1WdjHTVlt8s6frgvNcCskz2eaD6Jji1R7JOxMKH8Kh9QeoZTKIui+H5V0D4XrN7ZscTXsiNxTXVJzGboBN4GLSFkmP41OJsTlvJkXxPkQZd3nCPL+ykLA4/erRtNGhmQObJYl3leS8TFfcL+HTyaB9EN4zvfk/lIAnDlIfUnOOw5qh61iYj+z+GCzch3J8iAy8VpGtFQhVBia7TSWmmGsVPU8xyqceBdiN6mdFU+PoyKmY5ZliTronzE45/F9n+ZCZp9gsi0kNkD1GfR9AgMBAAECggEAVoNa2nwO5O/t5nqCf52/sy3+ykaHLPqyFmrLlTkjqcucI+/16gEbXK0dHEJlIFBjw65EJl+g/YnY2qYuR30vkb/adkk3jIRK9lFjdwwMjZbPEm1wbISbKZt85q8eurqHD+s+QZlMno934RQOh9BIV71PTAHM5i+k3MiuPO3k6lxIHAT9JWzP4uAQdKlaRNOL86u3yvn+S1KepaWj4Yy0yKBxJkrXQXXMauD1/Kq6JK3PbxvSdnv4L+LfERzillOLBYnVRCyiUwnqT/iM9uh/VcR5KadLNIkZP9U8xwbnLo1jm7tz8BaG0t6dXLzCHGTRRYlgmpswfZdKHip3k8twfQKBgQDkHE9IXuSpvTudYdiQFuadC6Z4NtZ2xGSbuNzNpw8/mcW1Lq7GJRblO3gCz3gdgUr/ePGa0c2epoT369yc/M3EIhb4UPxhkQco6qxKRzPpPO20uHa535104TQK//RrfI/TGnHmYPjB4wFTP+4ACh8R+riLrfIZcqiT+mlUt7PUcwKBgQCwMoa1GkdlI4d2bkelb4sdfQJOWBEBjHEUGWUy5A0Y7nTzS1ieVnR3oZF5qfkCdC3b6RodfGzMY+X27u86MfV5AIZKEnlJ5MQbGfCCgFhLtb748bz6owHfPL2KPqLl9awcupzz99HA/5/4TuWPALNTSLpaTbW2LZyopGJNFDLHTwKBgGCIMmz362CBejbx70max2DySzJYUo3UMpdLtfU5m1RY6Lfx13h2vaeocPMPhU9HJcvTDLttycw3v9GC+MtemF1F596Rtxw62YLRPLP6SdeMNzPhVCz4mpOZsgJtqqvJ/LtjV4wcwWibfjYSuc8+eUOMjIhfxjJKuVhWAjkdvHZNAoGBAKDwpebKaChTuapNtRfBuRpoUzDodDAr7iXjxHIlqGj7dsu8KOgIJD4Z0F2HCjJZmIHke7wvKNnQ7f8N5GoNtCCggAkssqjyUsZGfU9WmFAfZJ7TgECXoGAehSq/Z+AQ9PMQ6chWtrtJQv92YWyrwSDzr3RIww/yvcO00y2Ao5k1AoGAXlxcBWlWpXsLI9CldXp7PnlLst+I3Fwy8kDVVWWfOaJLq0+muv7ZRDmbjVmhBkPY+UUMAzjzJ08GF4Ec8zGc9aMeKA5KVC6pWbvtlP3hPs3oK6fdAUHMlZIWixvYcmqxSWGVmtfFQko/0cHwzdquC7KHvhtAvj8CkNYqpbpX5Lg=
+  alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmwhz7H3eoZJ+yMrt3yPnNlteQEYd7DVPC8BcAASsePkl3gXkJ0Z6FeAuDW4XPl0YNo9UCAcRJoMJ5cvvMAGEGf1IYA1Jvn552PBSRCbs1Hyrxd7LWyaEJvrHnzJAnqKrbGDJTReUGHNQXGFZcsE6237MNY4kvia2caz+kq3kO1kr/t4Rz/u7m/17BfYDvdeuMkj6eINfBcbati+dKxLXlde5aU1WlzmB/JsO+qQnDDOXbtt075McloC9XAnSp/PHktgFj/ogACYWQ5iequbGanV9qO3XNLapD7HDceMILgG1B9al8GJu0twLp7xF1p7qePsCV5DoSuKejZv68OJ72QIDAQAB
+  notifyUrl: http://3jjewf.natappfree.cc/api/alipay/notify

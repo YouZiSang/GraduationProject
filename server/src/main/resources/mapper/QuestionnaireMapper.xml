@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.QuestionnaireDao">
+    <select id="questionnaire" parameterType="com.example.yzs.entity.Questionnaire">
+        SELECT q.id            AS id,
+               q.question_text AS questionText,
+               q.type          AS questionType,
+               o.id            AS answerId,
+               o.options       AS options,
+               o.option_text   AS optionText
+        FROM questions q
+                 LEFT JOIN options o ON q.id = o.question_id
+        ORDER BY q.id, o.id;
+    </select>
+    <insert id="answerQuestion" parameterType="com.example.yzs.entity.Questionnaire">
+        INSERT INTO answers (uid,question_id, answer_option)
+        VALUES
+        <foreach collection="list" item="answer" separator=",">
+            (#{answer.uid},#{answer.questionId}, #{answer.answerOption})
+        </foreach>
+    </insert>
+    <select id="surveyCompleted">
+        SELECT COUNT(*)
+        FROM answers
+        WHERE uid = #{uid}
+    </select>
+    <insert id="typeScores" parameterType="com.example.yzs.entity.Questionnaire">
+        INSERT INTO survey_scores (uid, type, type_score,created_time)
+        VALUES
+        <foreach collection="list" item="score" separator=",">
+            (#{score.uid},#{score.questionType}, #{score.typeScores}, NOW())
+        </foreach>
+    </insert>
+    <select id="echartsTypeScores" parameterType="com.example.yzs.entity.Questionnaire">
+        SELECT  s.type_score as typeScores,q.name as typeName
+        FROM survey_scores s
+                 LEFT JOIN questions_type q ON s.type = q.id
+    </select>
+</mapper>

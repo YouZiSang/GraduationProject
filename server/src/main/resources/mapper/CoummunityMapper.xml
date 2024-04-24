@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.exchange.CommunityDao">
+    <insert id="addArticles" parameterType="com.example.yzs.entity.exchange.Community">
+        INSERT INTO landlord_messages (message_id, avatar, name, content, created_time, role, like_count, comment_count)
+        VALUES (#{messageId}, #{avatar}, #{name}, #{content}, NOW(), #{role}, 0, 0)
+    </insert>
+    <select id="selectAllArticles" resultType="com.example.yzs.entity.exchange.Community">
+        SELECT *
+        FROM landlord_messages
+        where deleted = 0
+        ORDER BY created_time ASC
+    </select>
+    <select id="selectLike">
+        SELECT landlord_id, like_count
+        from landlord_messages
+        where deleted = 0 where landlord_id = #{landlordId}
+    </select>
+    <update id="updateMessages">
+        UPDATE landlord_messages
+        <set>
+            like_count = like_count+1,
+        </set>
+        WHERE landlord_id = #{landlordId}
+        AND message_id = #{messageId}
+    </update>
+    <insert id="addThumbsUp" parameterType="com.example.yzs.entity.exchange.Comment" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO thumbs_up (landlord_id, thumbs_up_id, created_time, message_id, comment_reply_id)
+        VALUES (#{landlordId}, #{thumbsUpId}, NOW(), #{messageId}, #{commentReplyId})
+    </insert>
+    <select id="selectAllThumbsUp">
+        SELECT id, landlord_id, thumbs_up_id, message_id, comment_reply_id
+        FROM thumbs_up
+
+    </select>
+    <insert id="addComments" parameterType="com.example.yzs.entity.exchange.Comment" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO comments (landlord_id, comment_id, avatar, name, content, created_time, message_id, reply_id, role,
+                              like_count, comment_count)
+        VALUES (#{landlordId}, #{commentId}, #{avatar}, #{name}, #{content}, NOW(), #{messageId}, #{replyId}, #{role},
+                0, 0)
+    </insert>
+    <update id="addCommentsToMessages">
+        UPDATE landlord_messages
+        <set>
+            comment_count = comment_count + 1
+        </set>
+        WHERE landlord_id = #{landlordId}
+    </update>
+    <select id="selectAllComment">
+        select *
+        from comments
+        where deleted = 0
+    </select>
+    <update id="updateCommentThumbsUp">
+        UPDATE comments
+        <set>
+            like_count = like_count + 1
+        </set>
+        WHERE landlord_id = #{landlordId}
+        AND id = #{commentReplyId}
+        AND message_id = #{messageId}
+
+    </update>
+    <update id="updateCommentNumber">
+        UPDATE comments
+        <set>
+            comment_count = comment_count + 1
+        </set>
+        WHERE id = #{replyId}
+    </update>
+    <delete id="deleteThumbsUp">
+        DELETE
+        FROM thumbs_up
+        WHERE landlord_id = #{landlordId}
+          AND thumbs_up_id = #{thumbsUpId}
+          AND message_id = #{messageId}
+          AND comment_reply_id IS NULL
+    </delete>
+    <update id="deleteThumbsUpLike">
+        UPDATE landlord_messages
+        <set>
+            like_count = like_count - 1
+        </set>
+        <where>
+            landlord_id = #{landlordId} AND message_id = #{messageId}
+        </where>
+    </update>
+    <delete id="deleteCommentThumbsUp">
+        DELETE
+        FROM thumbs_up
+        WHERE landlord_id = #{landlordId}
+          AND thumbs_up_id = #{thumbsUpId}
+          AND comment_reply_id = #{commentReplyId}
+          AND message_id = #{messageId}
+    </delete>
+    <update id="deleteCommentThumbsUpLike">
+        UPDATE comments
+        <set>
+            like_count = like_count - 1
+        </set>
+        <where>
+            landlord_id = #{landlordId} AND id = #{commentReplyId}
+        </where>
+    </update>
+    <select id="selectThumbsUp">
+        SELECT like_count
+        FROM comments
+        WHERE id = #{commentReplyId}
+    </select>
+    <update id="addThumbsUpLike">
+        UPDATE landlord_messages
+        <set>
+            like_count = like_count + 1
+        </set>
+        <where>
+            landlord_id = #{landlordId} AND message_id = #{messageId}
+        </where>
+    </update>
+    <update id="deleteArticle">
+        UPDATE landlord_messages SET deleted = 1
+        WHERE landlord_id = #{landlordId}
+    </update>
+    <update id="delArticleAllComment">
+        UPDATE comments SET deleted = 1
+        WHERE landlord_id = #{landlordId}
+    </update>
+    <update id="deleteComment">
+        UPDATE comments SET deleted = 1
+        WHERE id = #{id}
+    </update>
+</mapper>

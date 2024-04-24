@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.yzs.dao.NoticeDao">
+    <insert id="addNotice" parameterType="com.example.yzs.entity.Notice" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO notice (aid,title, content, created_time, updated_time)
+        VALUES (#{aid},#{title}, #{content}, NOW(), NOW())
+    </insert>
+    <select id="getAllNotice" parameterType="com.example.yzs.entity.Notice">
+        SELECT id, title, content, created_time, updated_time
+        FROM notice
+        where deleted = 0
+    </select>
+    <update id="editNotice">
+        UPDATE notice
+        <set>
+            title = #{title},
+            content = #{content},
+            updated_time = NOW()
+        </set>
+        WHERE id = #{id} and aid = #{aid}
+    </update>
+    <update id="deleteNotice" parameterType="com.example.yzs.entity.Notice">
+        UPDATE notice
+        <set>
+            deleted = 1
+        </set>
+        WHERE id = #{id}
+    </update>
+    <select id="getCarouselImg">
+        SELECT *
+        FROM carousel
+    </select>
+    <update id="editCarouselImg">
+        UPDATE carousel
+        <set>
+            <if test="firstImage != null">
+                first_image = #{firstImage},
+            </if>
+            <if test="secondImage != null">
+                second_image = #{secondImage},
+            </if>
+            <if test="thirdImage != null">
+                third_image = #{thirdImage},
+            </if>
+            <if test="fourthImage != null">
+                fourth_image = #{fourthImage},
+            </if>
+            <if test="aid != null">
+            aid = #{aid},
+            </if>
+            updated_time = NOW()
+        </set>
+    </update>
+    <select id="findEvaluationHigh">
+        SELECT COUNT(*) AS totalSettle
+        FROM consultation_evaluation
+        WHERE (attitude + professional + reliable) &gt;= 12;
+    </select>
+</mapper>
