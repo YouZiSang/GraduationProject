@@ -5,7 +5,7 @@
 <img width="461" alt="image" src="https://github.com/YouZiSang/GraduationProject/assets/147829981/0a7a057d-0f6b-4087-98a2-1e7a28bccb39">
 <img width="454" alt="image" src="https://github.com/YouZiSang/GraduationProject/assets/147829981/d077fa65-4b19-4669-8992-4ce99a4bed2d">
 <br/>
-效果图如下：
+效果图如下：<br/>
 预约管理：<img width="456" alt="image" src="https://github.com/YouZiSang/GraduationProject/assets/147829981/ad0c16db-d1b9-41e1-ae67-c84ed2be06e1">
 咨询管理：
 <br><img width="456" alt="image" src="https://github.com/YouZiSang/GraduationProject/assets/147829981/1bbd3dbb-665e-42c9-adfc-926613cacc49">
